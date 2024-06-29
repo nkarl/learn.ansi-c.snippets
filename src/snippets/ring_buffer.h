@@ -11,10 +11,10 @@ typedef unsigned int   u32;
 typedef unsigned long  u64;
 
 typedef struct ring {
-    u32 *const buf;  // pointer to another memory location 
+    u32 *const buf;  // const pointer to a memory location of size u32
     i32        head;
     i32        tail;
-    const i32  cap;
+    i32 const  cap;
 } Ring;
 
 Ring *new(i32 cap);

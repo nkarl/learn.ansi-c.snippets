@@ -3,18 +3,18 @@
 ##################################################################
 CWD := $(shell echo $$(pwd))
 
-HDR			:= ${CWD}/src/hdr
-SRC			:= ${CWD}/src
-BUILD			:= ${CWD}/build
+HDR		:= ${CWD}/src/hdr
+SRC		:= ${CWD}/src
+BUILD		:= ${CWD}/build
 
 ## BUILD MAIN APP ################################################
-SRC_MAIN		:= ${SRC}/main
-BUILD_MAIN		:= ${BUILD}/main
-APP			:= ${BUILD_MAIN}/app
+SRC_MAIN	:= ${SRC}/main
+BUILD_MAIN	:= ${BUILD}/main
+APP		:= ${BUILD_MAIN}/app
 
 ## BUILD SNIPPETS ################################################
-SRC_SNIPPETS 		:= ${SRC}/snippets
-BUILD_SNIPPETS		:= ${BUILD}/snippets
+SRC_SNIPPETS 	:= ${SRC}/snippets
+BUILD_SNIPPETS	:= ${BUILD}/snippets
 
 SNIPPETS := ring_buffer.o
 SNIPPETS := ${addprefix ${BUILD_SNIPPETS}/, ${SNIPPETS}}
@@ -22,12 +22,11 @@ SNIPPETS := ${addprefix ${BUILD_SNIPPETS}/, ${SNIPPETS}}
 ##################################################################
 ## Compiler Flags
 ##################################################################
-INCLUDE 		:= -I${HDR} -I${SRC_SNIPPETS}
-CXX			:= gcc-14.1.0 # run make CXX=clang
-COMPILER_FLAGS		:= -g \
-			   -Wall -Wextra -Wconversion -Wpedantic \
-			   ${INCLUDE}
-LINKER_FLAGS		:=
+INCLUDE 	:= -I${HDR} -I${SRC_SNIPPETS}
+CXX		:= gcc-14.1.0 # run make CXX=clang
+COMPILER_FLAGS	:= -g -Wall -Wextra -Wconversion -Wpedantic \
+		${INCLUDE}
+LINKER_FLAGS	:=
 
 ##################################################################
 ## Build Recipes
