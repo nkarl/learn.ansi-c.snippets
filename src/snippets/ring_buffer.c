@@ -82,7 +82,7 @@ void print_ring_dec(Ring *ring) {
     printf("\n");
 }
 
-void test_pushing_empty_ring_at_maxed_cap(void) {
+void test_pushing_ring_with_zero_actual_cap(void) {
     MAKE_RING(ring, 1);
     u32 in     = 0x55;
     i32 signal = ring_push(&ring, in);
@@ -91,7 +91,16 @@ void test_pushing_empty_ring_at_maxed_cap(void) {
     assert(ring.head == ring.cap - 1);
 }
 
-void test_pushing_nonempty_ring_at_maxed_cap(void) {
+void test_popping_ring_with_zero_actual_cap(void) {
+    MAKE_RING(ring, 1);
+    u32 out    = 0;
+    i32 signal = ring_pop(&ring, &out);
+    print_ring_dec(&ring);
+    assert(signal == FAILURE);
+    assert(ring.tail == ring.cap - 1);
+}
+
+void test_pushing_nonempty_ring_at_cap(void) {
     MAKE_RING(ring, 2);
     u32 in     = 0x55;
     i32 signal = ring_push(&ring, in);
@@ -101,22 +110,13 @@ void test_pushing_nonempty_ring_at_maxed_cap(void) {
     assert(ring.head == ring.cap - 1);
 }
 
-void test_pushing_nonempty_ring_at_near_cap(void) {
+void test_pushing_nonempty_ring_near_cap(void) {
     MAKE_RING(ring, 2);
     u32 in     = 0x55;
     i32 signal = ring_push(&ring, in);
     print_ring_dec(&ring);
     assert(signal == SUCCESS);
     assert(ring.head == ring.cap - 1);
-}
-
-void test_popping_empty_ring_with_zero_actual_cap(void) {
-    MAKE_RING(ring, 1);
-    u32 out    = 0;
-    i32 signal = ring_pop(&ring, &out);
-    print_ring_dec(&ring);
-    assert(signal == FAILURE);
-    assert(ring.tail == ring.cap - 1);
 }
 
 void test_popping_empty_ring(void) {
@@ -190,11 +190,12 @@ void test_full_ring(void) {
 }
 
 i32 test_ring(void) {
-    test_pushing_empty_ring_at_maxed_cap();
-    test_pushing_nonempty_ring_at_maxed_cap();
-    test_pushing_nonempty_ring_at_near_cap();
+    test_pushing_ring_with_zero_actual_cap();
+    test_popping_ring_with_zero_actual_cap();
 
-    test_popping_empty_ring_with_zero_actual_cap();
+    test_pushing_nonempty_ring_at_cap();
+    test_pushing_nonempty_ring_near_cap();
+
     test_popping_empty_ring();
     test_popping_nonempty_ring_at_cap();
 
