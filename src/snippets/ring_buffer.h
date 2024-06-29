@@ -21,6 +21,6 @@ Ring *new(i32 cap);
 void release(Ring *buf);
 i32  ring_push(Ring *, u32);
 i32  ring_pop(Ring *, u32 *);
-int  test_ring(void);
+i32  test_ring(void);
 
 #endif

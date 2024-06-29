@@ -4,8 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SUCCESS 0
-#define FAILURE -1
+enum
+{
+    SUCCESS = 0,
+    FAILURE = -1
+};
 
 Ring *new(i32 cap) {
     Ring *buf           = malloc(sizeof(Ring));
@@ -181,7 +184,7 @@ void test_full_ring(void) {
     print_ring_dec(&ring);
 }
 
-int test_ring(void) {
+i32 test_ring(void) {
     test_pushing_empty_ring_at_maxed_cap();
     test_pushing_nonempty_ring_at_maxed_cap();
     test_pushing_nonempty_ring_at_near_cap();
