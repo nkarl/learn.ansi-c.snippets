@@ -11,7 +11,7 @@ typedef unsigned int   u32;
 typedef unsigned long  u64;
 
 typedef struct ring {
-    u32 *const buf;
+    u32 *const buf;  // pointer to another memory location 
     i32        head;
     i32        tail;
     const i32  cap;

@@ -70,7 +70,7 @@ void print_ring_hex(Ring *ring) {
 
 void print_ring_dec(Ring *ring) {
     printf("&ring=%ld\n", (long)(void *)ring);
-    printf("&buf =%ld %d\n", (long)(void *)&ring->buf, *ring->buf);
+    printf("&buf =%ld %d\n", (long)(void *)ring->buf, *ring->buf);
     printf("&head=%ld %d\n", (long)(void *)&ring->head, ring->head);
     printf("&tail=%ld %d\n", (long)(void *)&ring->tail, ring->tail);
     printf("&cap =%ld %d\n", (long)(void *)&ring->cap, ring->cap);
