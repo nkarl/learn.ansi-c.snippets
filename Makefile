@@ -34,13 +34,13 @@ LINKER_FLAGS		:=
 app: ${APP}
 
 ${APP}: ${SNIPPETS} ${APP}.o
-	${CXX} ${LINKER_FLAGS} $^ -o $@
+	${CXX} ${LINKER_FLAGS} -o $@ $^
 
 ${BUILD_MAIN}/%.o: ${SRC_MAIN}/%.c | setup
-	${CXX} ${COMPILER_FLAGS} -c $^ -o $@
+	${CXX} ${COMPILER_FLAGS} -o $@ -c $^ 
 
 ${BUILD_SNIPPETS}/%.o: ${SRC_SNIPPETS}/%.c | setup
-	${CXX} ${COMPILER_FLAGS} -c $^ -o $@
+	${CXX} ${COMPILER_FLAGS} -o $@ -c $^
 
 .PHONY: setup
 setup: 		## set up the build directories
