@@ -42,6 +42,7 @@ i32 ring_pop(Ring *ring, u32 *out) {
     return SUCCESS;
 }
 
+// NOTE: will allocate a new ring on the stack (fast), which also means no need if live and die inside a context.
 #define MAKE_RING(name, size)                         \
     u32  name##_data_space[size] = {0};               \
     Ring name                    = {                  \
