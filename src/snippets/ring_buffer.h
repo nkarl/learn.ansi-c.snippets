@@ -10,17 +10,17 @@ typedef unsigned short u16;
 typedef unsigned int   u32;
 typedef unsigned long  u64;
 
-typedef struct ring {
+typedef struct ring_buffer {
     u32 *const buf;  // const pointer to a memory location of size u32
-    i32        head;
-    i32        tail;
+    i32        front;
+    i32        back;
     i32 const  cap;
-} Ring;
+} RingBuffer;
 
-Ring *new(i32 cap);
-void release(Ring *buf);
-i32  ring_push(Ring *, u32);
-i32  ring_pop(Ring *, u32 *);
+RingBuffer *new(i32 cap);
+void release(RingBuffer *buf);
+i32  ring_push(RingBuffer *, u32);
+i32  ring_pop(RingBuffer *, u32 *);
 i32  test_ring(void);
 
 #endif
