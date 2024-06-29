@@ -1,6 +1,8 @@
 ##################################################################
 ## Project Variables
 ##################################################################
+CWD := $(shell echo $$(pwd))
+
 HDR			:= ${CWD}/src/hdr
 SRC			:= ${CWD}/src
 BUILD			:= ${CWD}/build
@@ -33,7 +35,7 @@ LINKER_FLAGS		:=
 .PHONY: app	## compile and build main app
 app: ${APP}
 
-${APP}: ${SNIPPETS} ${APP}.o
+${APP}: ${APP}.o ${SNIPPETS}
 	${CXX} ${LINKER_FLAGS} -o $@ $^
 
 ${BUILD_MAIN}/%.o: ${SRC_MAIN}/%.c | setup
@@ -43,7 +45,7 @@ ${BUILD_SNIPPETS}/%.o: ${SRC_SNIPPETS}/%.c | setup
 	${CXX} ${COMPILER_FLAGS} -o $@ -c $^
 
 .PHONY: setup
-setup: 		## set up the build directories
+setup:
 	$(info $(shell mkdir -p ${BUILD_MAIN} ${BUILD_SNIPPETS}))
 
 ##################################################################
