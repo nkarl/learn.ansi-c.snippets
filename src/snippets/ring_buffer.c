@@ -22,10 +22,12 @@ enum
 
 typedef RingBuffer Ring;
 
-Ring *new(i32 cap) {
-    Ring *buf           = malloc(sizeof(Ring));
-    *(i32 *)(&buf->cap) = cap;
-    return buf;
+Ring *new(u32 size) {
+    Ring *ring         = malloc(sizeof(Ring));
+    i32  *buffer       = malloc(size * sizeof(i32));
+    *(i32 **)ring->buf = buffer;
+    *(u32 *)&ring->cap = size;
+    return ring;
 }
 
 void release(Ring *ring) {
@@ -45,8 +47,8 @@ void release(Ring *ring) {
  *    - if it lands on cap, then reset it to 0.
  *  - if `front == back`, which means full ring.
  */
-i32 ring_push(Ring *ring, u32 in) {
-    i32 next_front = ring->front + 1;
+i32 ring_push(Ring *ring, i32 in) {
+    u32 next_front = ring->front + 1;
 
     if (next_front >= ring->cap) next_front = 0;
     if (next_front == ring->back) return FAILURE;
@@ -62,10 +64,10 @@ i32 ring_push(Ring *ring, u32 in) {
  *  - where the next `back` will land.
  *    - if it lands on cap, reset it to 0.
  */
-i32 ring_pop(Ring *ring, u32 *out) {
+i32 ring_pop(Ring *ring, i32 *out) {
     if (ring->front == ring->back) return FAILURE;  // NOTE: check for empty ring
 
-    i32 next_back = ring->back + 1;
+    u32 next_back = ring->back + 1;
     if (next_back >= ring->cap) next_back = 0;
 
     *out       = ring->buf[ring->back];
@@ -78,43 +80,50 @@ i32 ring_pop(Ring *ring, u32 *out) {
  * no need for `malloc` and `free` if live and die inside the context
  */
 #define MAKE_RING(name, size)                          \
-    u32  name##_data_space[size] = {0};                \
+    i32  name##_data_space[size] = {0};                \
     Ring name                    = {                   \
                            .buf   = name##_data_space, \
                            .front = 0,                 \
                            .back  = 0,                 \
                            .cap   = size}
 
+#define MAKE_RING_WITH_PTR(name, size, buffer_ptr) \
+    Ring name = {                                  \
+        .buf   = buffer_ptr,                       \
+        .front = 0,                                \
+        .back  = 0,                                \
+        .cap   = size}
+
 void ring_struct_info(Ring *ring) {
-    printf("sizeof Ring =%ld\n", sizeof(Ring));
-    printf("sizeof .buf =%ld\n", sizeof(ring->buf));
+    printf("sizeof Ring  =%ld\n", sizeof(Ring));
+    printf("sizeof .buf  =%ld\n", sizeof(ring->buf));
     printf("sizeof .front=%ld\n", sizeof(ring->front));
-    printf("sizeof .back=%ld\n", sizeof(ring->back));
-    printf("sizeof .cap =%ld\n", sizeof(ring->cap));
+    printf("sizeof .back =%ld\n", sizeof(ring->back));
+    printf("sizeof .cap  =%ld\n", sizeof(ring->cap));
     printf("\n");
 }
 
 void print_ring_hex(Ring *ring) {
-    printf("&ring=%p\n", (void *)ring);
-    printf("&buf =%p %d\n", (void *)ring->buf, *ring->buf);
-    printf("&buf =%p %d\n", (void *)&ring->front, ring->front);
-    printf("&buf =%p %d\n", (void *)&ring->back, ring->back);
-    printf("&buf =%p %d\n", (void *)&ring->cap, ring->cap);
+    printf("&ring =%p\n", (void *)ring);
+    printf("&buf  =%p %d\n", (void *)ring->buf, *ring->buf);
+    printf("&front=%p %d\n", (void *)&ring->front, ring->front);
+    printf("&back =%p %d\n", (void *)&ring->back, ring->back);
+    printf("&cap  =%p %d\n", (void *)&ring->cap, ring->cap);
     printf("\n");
 }
 
 void print_ring_dec(Ring *ring) {
-    printf("&ring=%ld\n", (long)(void *)ring);
-    printf("&buf =%ld %d\n", (long)(void *)ring->buf, *ring->buf);
+    printf("&ring =%ld\n", (long)(void *)ring);
+    printf("&buf  =%ld %d\n", (long)(void *)ring->buf, *ring->buf);
     printf("&front=%ld %d\n", (long)(void *)&ring->front, ring->front);
-    printf("&back=%ld %d\n", (long)(void *)&ring->back, ring->back);
-    printf("&cap =%ld %d\n", (long)(void *)&ring->cap, ring->cap);
+    printf("&back =%ld %d\n", (long)(void *)&ring->back, ring->back);
+    printf("&cap  =%ld %d\n", (long)(void *)&ring->cap, ring->cap);
     printf("\n");
 }
 
 void test_pushing_ring_with_zero_actual_cap(void) {
     MAKE_RING(ring, 1);
-    u32 in     = 0x55;
+    i32 in     = 0x55;
     i32 signal = ring_push(&ring, in);
     print_ring_dec(&ring);
     assert(signal == FAILURE);
@@ -123,7 +132,7 @@ void test_pushing_ring_with_zero_actual_cap(void) {
 
 void test_popping_ring_with_zero_actual_cap(void) {
     MAKE_RING(ring, 1);
-    u32 out    = 0;
+    i32 out    = 0;
     i32 signal = ring_pop(&ring, &out);
     print_ring_dec(&ring);
     assert(signal == FAILURE);
@@ -132,7 +141,7 @@ void test_popping_ring_with_zero_actual_cap(void) {
 
 void test_pushing_nonempty_ring_at_cap(void) {
     MAKE_RING(ring, 2);
-    u32 in     = 0x55;
+    i32 in     = 0x55;
     i32 signal = ring_push(&ring, in);
     signal     = ring_push(&ring, in << 1);
     print_ring_dec(&ring);
@@ -142,7 +151,7 @@ void test_pushing_nonempty_ring_at_cap(void) {
 
 void test_pushing_nonempty_ring_near_cap(void) {
     MAKE_RING(ring, 2);
-    u32 in     = 0x55;
+    i32 in     = 0x55;
     i32 signal = ring_push(&ring, in);
     print_ring_dec(&ring);
     assert(signal == SUCCESS);
@@ -151,7 +160,7 @@ void test_pushing_nonempty_ring_near_cap(void) {
 
 void test_popping_empty_ring(void) {
     MAKE_RING(ring, 2);
-    u32 out    = 0;
+    i32 out    = 0;
     i32 signal = ring_pop(&ring, &out);
     print_ring_dec(&ring);
     assert(signal == FAILURE);
@@ -160,7 +169,7 @@ void test_popping_empty_ring(void) {
 
 void test_popping_nonempty_ring_at_cap(void) {
     MAKE_RING(ring, 2);
-    u32 in = 0x55, out = 0;
+    i32 in = 0x55, out = 0;
     i32 signal = ring_push(&ring, in);
     assert(signal == SUCCESS);
     signal = ring_pop(&ring, &out);
@@ -171,7 +180,7 @@ void test_popping_nonempty_ring_at_cap(void) {
 
 void test_empty_ring(void) {
     MAKE_RING(ring, 3);
-    u32 in = 0x55, out = 0;
+    i32 in = 0x55, out = 0;
     i32 signal = ring_push(&ring, in);
     assert(signal == SUCCESS);
     signal = ring_push(&ring, in << 1);
@@ -192,7 +201,7 @@ void test_empty_ring(void) {
 
 void test_full_ring(void) {
     MAKE_RING(ring, 3);
-    u32 in = 0x55, out = 0;
+    i32 in = 0x55, out = 0;
     i32 signal = ring_push(&ring, in);
     assert(signal == SUCCESS);
     signal = ring_push(&ring, in << 1);
@@ -219,6 +228,20 @@ void test_full_ring(void) {
     print_ring_dec(&ring);
 }
 
+void test_heap_ring(void) {
+    u32  size   = 2;
+    i32 *buffer = malloc(size * sizeof(i32));
+
+    MAKE_RING_WITH_PTR(ring, size, buffer);
+
+    i32 in = 0x55, out = 0;
+    i32 signal = ring_push(&ring, in);
+    assert(signal == SUCCESS);
+    signal = ring_pop(&ring, &out);
+    assert(signal == SUCCESS);
+    print_ring_dec(&ring);
+}
+
 i32 test_ring(void) {
     test_pushing_ring_with_zero_actual_cap();
     test_popping_ring_with_zero_actual_cap();
@@ -231,6 +254,8 @@ i32 test_ring(void) {
 
     test_empty_ring();
     test_full_ring();
+
+    test_heap_ring();
 
     return SUCCESS;
 }
