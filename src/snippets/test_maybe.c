@@ -19,8 +19,23 @@ void test_fmap(void) {
     __show_obj(my);
     int z = fmap2((*add), mx.__data, 2);
     printf("%d\n", z);
+    Maybe(int) mz = Unit(Maybe(int))(z);
+    __show_obj(mz);
 }
 
+/*
+ * NOTE:
+ *  The goal of this exercise is to see if it is possible to implement
+ *  a type-polymorphic contextual wrapper.
+ *
+ *  As predicted, for the a low-leveled language like C, everything
+ *  ultimately boils down to *signals*, which includes the value `NULL`.
+ *  If used properly, it should not be an issue.
+ *
+ *  However, the goal of this exercise is *to push the limits* and
+ *  figure out where potential issues might arise.
+ *
+ */
 void test_maybe(void) {
     test_make_maybe();
     test_fmap();
