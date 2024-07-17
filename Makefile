@@ -3,7 +3,7 @@
 ##################################################################
 CWD := $(shell echo $$(pwd))
 
-HDR		:= ${CWD}/src/hdr
+HDR		:= ${CWD}/hdr
 SRC		:= ${CWD}/src
 BUILD		:= ${CWD}/build
 
@@ -16,7 +16,7 @@ APP		:= ${BUILD_MAIN}/app
 SRC_SNIPPETS 	:= ${SRC}/snippets
 BUILD_SNIPPETS	:= ${BUILD}/snippets
 
-SNIPPETS := ring_buffer.o
+SNIPPETS := ring_buffer.o test_maybe.o
 SNIPPETS := ${addprefix ${BUILD_SNIPPETS}/, ${SNIPPETS}}
 
 ##################################################################

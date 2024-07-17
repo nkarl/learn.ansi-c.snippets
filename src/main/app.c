@@ -1,5 +1,8 @@
-#include "ring_buffer.h"
+/*#include "ring_buffer.h"*/
+#include "test_maybe.h"
+#include <stdio.h>
 
-int main() {
-    test_ring();
+int main(void) {
+    /*test_ring();*/
+    test_maybe();
 }
